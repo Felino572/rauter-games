@@ -1,1 +1,60 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rauter Games - Panel Maestro</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script><style>body{background:#0a0a0a;color:#fff}</style></head><body class="p-4"><div class="max-w-7xl mx-auto"><h1 class="text-3xl font-bold mb-2"><span class="bg-[#FF7A00] text-black px-3 py-1 rounded">RG</span> Rauter Games <span class="text-[#FF7A00]">Panel</span> <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded-full ml-2">Conectado CDMX</span></h1><p class="text-gray-400 text-xs mb-6">Supabase: cxocgsfcbbzstuqxvezi.supabase.co</p><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="bg-zinc-900 p-3 rounded border border-zinc-800 text-center"><div class="text-gray-400 text-xs">Clientes</div><div id="stat-clientes" class="text-2xl font-bold text-[#FF7A00]">0</div></div><div class="bg-zinc-900 p-3 rounded border border-zinc-800 text-center"><div class="text-gray-400 text-xs">Ruteros</div><div id="stat-ruteros" class="text-2xl font-bold text-[#FF7A00]">0</div></div><div class="bg-zinc-900 p-3 rounded border border-zinc-800 text-center"><div class="text-gray-400 text-xs">Máquinas</div><div id="stat-maquinas" class="text-2xl font-bold text-[#FF7A00]">0</div></div><div class="bg-zinc-900 p-3 rounded border border-zinc-800 text-center"><div class="text-gray-400 text-xs">Hopper Prom</div><div id="stat-hopper" class="text-2xl font-bold text-[#FF7A00]">0</div></div></div><div class="flex gap-2 mb-6"><button onclick="showTab('clientes')" id="btn-clientes" class="bg-[#FF7A00] text-black px-4 py-2 rounded font-bold">Clientes</button><button onclick="showTab('ruteros')" id="btn-ruteros" class="bg-zinc-800 px-4 py-2 rounded">Ruteros</button><button onclick="showTab('maquinas')" id="btn-maquinas" class="bg-zinc-800 px-4 py-2 rounded">Máquinas</button></div><div id="tab-clientes"><div class="grid md:grid-cols-2 gap-4"><div class="bg-zinc-900 p-4 rounded border border-zinc-800"><h2 class="text-[#FF7A00] font-bold mb-3">Crear Cliente</h2><input id="c-nombre" placeholder="Nombre" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><input id="c-empresa" placeholder="Empresa" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><input id="c-tel" placeholder="Telefono" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><input id="c-email" placeholder="Email" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><button onclick="crearCliente()" class="bg-[#FF7A00] text-black w-full py-2 rounded font-bold">Crear Cliente</button></div><div class="bg-zinc-900 p-4 rounded border border-zinc-800"><h2 class="text-[#FF7A00] font-bold mb-3">Lista</h2><div id="lista-clientes" class="space-y-2 text-sm"></div></div></div></div><div id="tab-ruteros" class="hidden"><div class="grid md:grid-cols-2 gap-4"><div class="bg-zinc-900 p-4 rounded border border-zinc-800"><h2 class="text-[#FF7A00] font-bold mb-3">Crear Rutero 1-40</h2><input id="r-numero" type="number" min="1" max="40" placeholder="Numero 1-40" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><input id="r-nombre" placeholder="Nombre Rutero" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><select id="r-cliente" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><option value="">Cliente</option></select><input id="r-tel" placeholder="Telefono" class="w-full bg-black border border-zinc-700 p-2 rounded mb-2"><button onclick="crearRutero()" class="bg-[#FF7A00] text-black w-full py-2 rounded font-bold">Crear Rutero</button></div><div class="bg-zinc-900 p-4 rounded border border-zinc-800"><h2 class="text-[#FF7A00] font-bold mb-3">Lista Ruteros</h2><div id="lista-ruteros" class="space-y-2 text-sm"></div></div></div></div><div id="tab-maquinas" class="hidden"><div class="grid md:grid-cols-2 gap-4"><div class="bg-zinc-900 p-4 rounded border border-zinc-800"><h2 class="te
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rauter Games - Panel Maestro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{font-family:Arial;background:#111;color:#fff;padding:20px}
+button{padding:10px 20px;margin:5px;background:#00ff88;color:#000;border:none;border-radius:5px;font-weight:bold;cursor:pointer}
+#lista{background:#222;padding:15px;margin-top:15px;border-radius:8px;white-space:pre-wrap}
+input{padding:10px;margin:5px;border-radius:5px;border:none}
+</style>
+</head>
+<body>
+<h1>🎮 Rauter Games - Panel Maestro</h1>
+<p style="color:#00ff88">Conectado a: cxocgsfcbbzstuqxvezi</p>
+
+<input id="nombreCliente" placeholder="Nombre cliente ej: Bar La Cumbre">
+<button onclick="crearCliente()">Crear Cliente</button>
+<button onclick="cargarClientes()">Cargar Clientes</button>
+
+<div id="lista">Dale a Cargar Clientes...</div>
+
+<script>
+const SUPABASE_URL = "https://cxocgsfcbbzstuqxvezi.supabase.co"
+const SUPABASE_KEY = "sb_publishable_Aa3Ns7pT3kL-6Usn8a-Icw_4Q35wD7a"
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+async function cargarClientes(){
+  document.getElementById('lista').innerText = "Cargando..."
+  const { data, error } = await client.from('clientes').select('*').order('id', {ascending:false})
+  if(error){
+    document.getElementById('lista').innerText = "ERROR: " + error.message
+    alert(error.message)
+    return
+  }
+  if(!data || data.length===0){
+    document.getElementById('lista').innerText = "0 clientes (tabla vacía)"
+  } else {
+    document.getElementById('lista').innerText = JSON.stringify(data, null, 2)
+  }
+  console.log(data)
+}
+
+async function crearCliente(){
+  const nombre = document.getElementById('nombreCliente').value
+  if(!nombre) return alert("Pon un nombre")
+  const { error } = await client.from('clientes').insert([{nombre: nombre}])
+  if(error) alert("Error: " + error.message)
+  else {
+    alert("Cliente creado chingón!")
+    document.getElementById('nombreCliente').value = ""
+    cargarClientes()
+  }
+}
+cargarClientes()
+</script>
+</body>
+</html>
