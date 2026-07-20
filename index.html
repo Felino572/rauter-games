@@ -1,89 +1,43 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rauter Games - Panel Maestro</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-<style>body{font-family:'Inter',sans-serif;background:#0a0a0a}h1{font-family:'Orbitron'}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAUTER GAMES - Panel</title>
+<style>
+body{margin:0;background:#0f0f0f;color:white;font-family:Arial,sans-serif}
+.header{display:flex;align-items:center;justify-content:center;gap:15px;padding:20px;background:#1a1a1a;border-bottom:2px solid #ff6a00}
+.header img{width:70px;height:70px;border-radius:50%;border:3px solid #ff6a00;object-fit:cover}
+.card{background:#1e1e1e;margin:20px;padding:20px;border-radius:15px;border:1px solid #333;text-align:center}
+.status{color:#ff6a00;font-weight:bold}
+</style>
 </head>
-<body class="text-white min-h-screen p-4 md:p-8">
-<div class="max-w-5xl mx-auto">
-  <div class="flex justify-between items-center mb-8 border-b border-orange-500/30 pb-4">
-    <h1 class="text-3xl text-orange-500">RAUTER <span class="text-white">GAMES</span></h1>
-    <span class="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">● Conectado: Supabase OK</span>
-  </div>
-
-  <div class="grid grid-cols-3 gap-4 mb-8">
-    <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800"><p class="text-zinc-500 text-sm">Total Clientes</p><p id="totalClientes" class="text-2xl font-bold">0</p></div>
-    <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800"><p class="text-zinc-500 text-sm">Activos</p><p id="activos" class="text-2xl font-bold text-green-400">0</p></div>
-    <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800"><p class="text-zinc-500 text-sm">Empresa</p><p class="text-2xl font-bold text-orange-500">Rauter</p></div>
-  </div>
-
-  <div class="bg-zinc-900 rounded-xl p-6 border border-zinc-800 mb-6">
-    <h3 class="font-bold mb-4">Agregar Cliente Nuevo</h3>
-    <div class="flex gap-2">
-      <input id="nombreCliente" class="flex-1 bg-black border border-zinc-700 rounded-lg p-3 outline-none focus:border-orange-500" placeholder="Nombre del local ej: Bar La Cumbre">
-      <button onclick="crearCliente()" class="bg-orange-500 hover:bg-orange-600 text-black font-bold px-6 rounded-lg">CREAR</button>
-    </div>
-  </div>
-
-  <div class="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
-    <div class="p-4 flex justify-between items-center bg-zinc-950">
-      <h3 class="font-bold">Clientes Registrados</h3>
-      <button onclick="cargarClientes()" class="text-sm bg-white text-black px-4 py-1.5 rounded font-bold">Actualizar</button>
-    </div>
-    <div id="lista" class="divide-y divide-zinc-800">Cargando...</div>
-  </div>
+<body>
+<div class="header">
+<img src="logo.png" alt="Rauter Games">
+<h1 style="margin:0">RAUTER GAMES</h1>
 </div>
-
+<div class="card">
+<h2>🐺 Panel Maestro</h2>
+<p>1 Cliente Activo</p>
+<h3>Bar La Cumbre</h3>
+<p class="status" id="status">Conectando a Supabase...</p>
+<p id="count">Cargando...</p>
+</div>
 <script>
-const SUPABASE_URL = "https://cxocgsfcbbzstuqxvezi.supabase.co"
-const SUPABASE_KEY = "sb_publishable_Aa3Ns7pT3kL-6Usn8a-Icw_4Q35wD7a"
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-
-async function cargarClientes(){
-  const cont = document.getElementById('lista')
-  cont.innerHTML = "Cargando..."
-  const { data, error } = await client.from('clientes').select('*').order('created_at', {ascending:false})
-  if(error){ cont.innerHTML = `<div class='p-4 text-red-400'>${error.message}</div>`; return }
-  document.getElementById('totalClientes').innerText = data.length
-  document.getElementById('activos').innerText = data.filter(c=>c.activo).length
-  
-  if(data.length===0){ cont.innerHTML = "<div class='p-8 text-center text-zinc-500'>Sin clientes aún</div>"; return }
-  
-  cont.innerHTML = data.map(c => `
-    <div class="p-4 flex justify-between items-center hover:bg-zinc-800/50">
-      <div>
-        <p class="font-bold">${c.nombre || 'Sin nombre'}</p>
-        <p class="text-xs text-zinc-500">${c.empresa || ''} • ${new Date(c.created_at).toLocaleDateString()}</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="text-xs px-2 py-1 rounded-full ${c.activo ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">${c.activo ? 'ACTIVO' : 'INACTIVO'}</span>
-        <button onclick="borrar('${c.id}')" class="text-zinc-500 hover:text-red-500">✕</button>
-      </div>
-    </div>
-  `).join('')
+const url='https://cxocgsfcbbzstuqxvezi.supabase.co/rest/v1/pulsos_caliz?select=*';
+const key='sb_publishable_Aa3Ns7pT3kL-6Usn8a-Icw_4Q35wD7a';
+async function cargar(){
+ try{
+  let r=await fetch(url,{headers:{apikey:key,Authorization:'Bearer '+key}});
+  let d=await r.json();
+  document.getElementById('status').innerText='✅ Conectado: Supabase OK';
+  document.getElementById('count').innerText=d.length+' pulsos recibidos';
+ }catch(e){
+  document.getElementById('status').innerText='❌ Error de conexión';
+ }
 }
-
-async function crearCliente(){
-  const input = document.getElementById('nombreCliente')
-  const nombre = input.value.trim()
-  if(!nombre) return
-  const { error } = await client.from('clientes').insert([{nombre: nombre, empresa: nombre, activo: true}])
-  if(error) alert(error.message)
-  else { input.value=""; cargarClientes() }
-}
-
-async function borrar(id){
-  if(!confirm("¿Borrar?")) return
-  await client.from('clientes').delete().eq('id', id)
-  cargarClientes()
-}
-
-cargarClientes()
+setInterval(cargar,3000);cargar();
 </script>
 </body>
 </html>
